@@ -1,7 +1,8 @@
 # controllers.py
 import tkinter as tk
-from AppSistemas.Herramienta_Desarrollo.modelo.Modelo import ImageConverterService, ExcelService
-from AppSistemas.Herramienta_Desarrollo.vista.Vista import MainView, Tool1View, Tool2View, FormateadorImagenView, CheckActaView
+from AppSistemas.Herramienta_Desarrollo.modelo.Modelo import ImageConverterService, ExcelService, ExtractorService
+from AppSistemas.Herramienta_Desarrollo.vista.Vista import MainView, HerramientasReplanteo, HerramientasInstalacion, \
+    FormateadorImagenView, CheckActaView, CrearComentarioView
 from tkinter import filedialog, messagebox
 
 class MainController:
@@ -16,19 +17,20 @@ class MainController:
         self.check_acta_view = None
         self.firmar_documento_view = None
         self.validar_y_firmar_view = None
+        self.check_comentarios_view = None
 
     def run(self):
         self.main_view.mainloop()
 
     def open_tool1(self):
         if self.tool1_view is None or not self.tool1_view.winfo_exists():
-            self.tool1_view = Tool1View(self)
+            self.tool1_view = HerramientasReplanteo(self)
         else:
             self.tool1_view.lift()
 
     def open_tool2(self):
         if self.tool2_view is None or not self.tool2_view.winfo_exists():
-            self.tool2_view = Tool2View(self)
+            self.tool2_view = HerramientasInstalacion(self)
         else:
             self.tool2_view.lift()
 
@@ -43,6 +45,11 @@ class MainController:
             self.check_acta_view = CheckActaView(self)
         else:
             self.check_acta_view.lift()
+    def comentarios(self):
+        if self.check_comentarios_view is None or not self.check_comentarios_view.winfo_exists():
+            self.check_comentarios_view = CrearComentarioView(self)
+        else:
+            self.check_comentarios_view.lift()
 
     def seleccionar_directorio(self):
         directorio_seleccionado = filedialog.askdirectory()
@@ -101,3 +108,62 @@ class MainController:
             else:
                 messagebox.showwarning("Advertencia", "Por favor, seleccione un archivo Excel primero.")
 
+
+    def relacion_nombre_aula_instalacion(self):
+        ruta_destino = False
+        ruta_archivo = ExtractorService.solicitar_archivo(self)
+        tipo = "instalación"
+        if ruta_archivo:
+            ruta_destino = ExtractorService.solicitar_destino(self)
+            if ruta_destino:
+                datos, nombre_centro, codigo_centro, tipo = ExtractorService.extraer_informacion(self, ruta_archivo, tipo)
+                if datos:
+                    ExtractorService.crear_nuevo_archivo(self, datos, nombre_centro, codigo_centro, ruta_destino, tipo)
+                else:
+                    messagebox.showwarning("Advertencia", "No se encontraron datos para extraer.")
+        if not ruta_archivo or not ruta_destino:
+            messagebox.showerror("Error", "El archivo no existe. Inténtalo de nuevo.")
+            return
+
+    def relacion_nombre_aula_replanteo(self):
+        ruta_destino = False
+        ruta_archivo = ExtractorService.solicitar_archivo(self)
+        tipo = "replanteo"
+        if ruta_archivo:
+            ruta_destino = ExtractorService.solicitar_destino(self)
+            if ruta_destino:
+                datos, nombre_centro, codigo_centro = ExtractorService.extraer_informacion(self, ruta_archivo, tipo)
+                if datos:
+                    ExtractorService.crear_nuevo_archivo(self, datos, nombre_centro, codigo_centro, ruta_destino, tipo)
+                else:
+                    messagebox.showwarning("Advertencia", "No se encontraron datos para extraer.")
+        if not ruta_archivo or not ruta_destino:
+            messagebox.showerror("Error", "El archivo no existe. Inténtalo de nuevo.")
+            return
+
+    def comentarios_automatiocs_replanteo(self, replanteo=False):
+        if replanteo:
+            ruta_archivo = filedialog.askopenfilename(title="Selecciona un acta de replanteo")
+        else:
+            ruta_archivo = filedialog.askopenfilename(title="Selecciona un acta de instalación")
+        if ruta_archivo:
+            if self.excel_service.comentario_automatico(ruta_archivo, replanteo):
+                messagebox.showinfo("Información", "📝 Comentarios Puestos con éxito 📝")
+            else:
+                messagebox.showwarning("Advertencia", "Por favor, seleccione un archivo Excel primero.")
+        return ruta_archivo, True
+
+    def boton_para_todo(self, replanteo=False):
+        if replanteo:
+            ruta, ok = self.comentarios_automatiocs_replanteo(True)
+            if self.firmar_documento(ruta) and ok:
+                messagebox.showinfo("Información", "📝 ¡Documento validado y firmado con éxito! 📝")
+            else:
+                messagebox.showwarning("Advertencia", "Por favor, seleccione un archivo Excel primero.")
+
+        else:
+            ruta, ok = self.comentarios_automatiocs_replanteo(False)
+            if self.validar_checks(ruta) and self.firmar_documento(ruta) and ok:
+                messagebox.showinfo("Información", "📝 ¡Documento validado y firmado con éxito! 📝")
+            else:
+                messagebox.showwarning("Advertencia", "Por favor, seleccione un archivo Excel primero.")
