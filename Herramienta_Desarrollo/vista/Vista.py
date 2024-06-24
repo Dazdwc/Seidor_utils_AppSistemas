@@ -411,8 +411,8 @@ class CrearComentarioView(tk.Toplevel):
             for item, var in self.items.items():
                 if var.get():
                     sace, sn = self.entries.get(item, (None, None))
-                    sace_text = f"Sace( {sace.get()}" if sace and sace.get() else ")"
-                    sn_text = f"SN( {sn.get()}" if sn and sn.get() else ")"
+                    sace_text = f" Sace( {sace.get()})" if sace and sace.get() else ""
+                    sn_text = f" SN( {sn.get()})" if sn and sn.get() else ""
                     selected_items.append(f"{item}{sace_text}{sn_text}")
             if selected_items:
                 comment1 = "Resum del material a retirar: " + ", ".join(selected_items) + "."
