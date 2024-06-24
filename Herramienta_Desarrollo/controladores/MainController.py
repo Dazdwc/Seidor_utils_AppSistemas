@@ -1,4 +1,3 @@
-# controllers.py
 import tkinter as tk
 from AppSistemas.Herramienta_Desarrollo.modelo.Modelo import ImageConverterService, ExcelService, ExtractorService
 from AppSistemas.Herramienta_Desarrollo.vista.Vista import MainView, HerramientasReplanteo, HerramientasInstalacion, \

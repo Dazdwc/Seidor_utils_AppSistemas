@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import ttk, messagebox
+from tkinter import ttk
 from tkinter.scrolledtext import ScrolledText
 
 tamaño_main = ""
