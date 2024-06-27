@@ -1,3 +1,4 @@
+import pyautogui
 from PIL import Image
 import openpyxl
 import imageio
@@ -221,7 +222,7 @@ class ExtractorService:
                 K17 = hoja['M19'].value
                 datos.append((C16, K17))
 
-            return datos, nombre_centro, codigo_centro
+            return datos, nombre_centro, codigo_centro, tipo
         if tipo == "replanteo":
             codigo_centro = hoja1['C9'].value  # Extraer el título de la primera hoja
             nombre_centro = hoja1['F9'].value
@@ -231,7 +232,7 @@ class ExtractorService:
                 K17 = hoja['K17'].value
                 datos.append((C16, K17))
 
-            return datos, nombre_centro, codigo_centro
+            return datos, nombre_centro, codigo_centro, tipo
 
     # Función para crear un nuevo archivo Excel con la información extraída
     def crear_nuevo_archivo(self, datos, nombre_centro, codigo_centro, ruta_destino, tipo):
@@ -269,3 +270,189 @@ class ExtractorService:
         else:
             messagebox.showwarning("Advertencia", "No se encontraron datos para extraer.")
             return False
+
+
+class AutomationService:
+    def __init__(self):
+        self.columnas_info = {
+            'codigo_centro': 'int',
+            'nombre_centro': 'String',
+            'codigo_nombre_centro': 'String',
+            'nombre_aula': 'String',
+            'numero_edificio': [1, 2, 3, 4, 5],
+            'planta': [1, 2, 3, 4, 5, -1, -2, -3],
+            'etapa': ['INFANTIL', 'PRIMARIA', 'ESO', 'BATXILLERAT', 'CICLOS FORMATIVOS', 'SENSE DEFINIR'],
+            'edificio_con_modulos': ['SI (Obligatori suport de carro de rodes)', 'No'],
+            'panel': ['65"', '75"', '86"'],
+            'tipo_soporte': [
+                'Paret FIX', 'Paret Regulable', 'Rodes FIX', 'Rodes Regulable',
+                'Paret amb Potes FIX (ESPECIAL PARET DE PLADUR O PARETS AMB POCA ESTABILITAT)',
+                'Paret amb Potes Regulable (ESPECIAL PARET DE PLADUR O PARETS AMB POCA ESTABILITAT)'
+            ],
+            'el_soporte_es_diferente': ['NO', 'SI'],
+            'tipo_pared': ['Totxo', 'Formigó', 'Mòdul', 'Pladur', 'Pedra', 'Rajola', 'Sense definir'],
+            'presa_electrica': [
+                'NO ÉS NECESSARI PRESA ELÈCTRICA', 'SI, 1m', 'SI, 3m', 'SI, 5m',
+                'SI, 10m', 'SI, més de 10m'
+            ],
+            'red': [
+                'NO ES REQUEREIX. La distancia entre punt de xarxa i lateral del panell es inferior a 2m.',
+                'NO ES REQUEREIX. La conexió serà per wifi.', 'SI, 5m', 'SI, 7m',
+                'SI, 10m', 'SI, 15m', 'SI, 20m', 'SI, més de 20m'
+            ]
+        }
+        self.datos = []
+
+    def automatizar_teclas(self):
+        ruta_archivo = filedialog.askopenfilename(title="Selecciona un archivo Excel", filetypes=[("Archivos Excel", "*.xlsx")])
+        if ruta_archivo:
+            try:
+                wb = openpyxl.load_workbook(ruta_archivo)
+                ws = wb.active
+
+                self.datos = []
+                for row in ws.iter_rows(min_row=2, max_row=ws.max_row):
+                    fila = {
+                        'codigo_centro': row[0].value,
+                        'nombre_centro': row[1].value,
+                        'codigo_nombre_centro': row[2].value,
+                        'nombre_aula': row[3].value,
+                        'numero_edificio': row[4].value,
+                        'planta': row[5].value,
+                        'etapa': row[6].value,
+                        'edificio_con_modulos': row[7].value,
+                        'panel': row[8].value,
+                        'tipo_soporte': row[9].value,
+                        'el_soporte_es_diferente': row[10].value,
+                        'tipo_pared': row[11].value,
+                        'presa_electrica': row[12].value,
+                        'red': row[13].value
+                    }
+                    self.datos.append(fila)
+
+                messagebox.showinfo("Información", "Datos recogidos correctamente. Ahora puedes ver los detalles.")
+                return self.datos
+            except Exception as e:
+                messagebox.showerror("Error", f"Error al procesar el archivo Excel: {e}")
+        else:
+            messagebox.showwarning("Advertencia", "Por favor, seleccione un archivo Excel.")
+
+    def procesar_datos(self, dato):
+        """
+        Lógica para procesar los datos recogidos y ejecutar una macro en función de los datos.
+        """
+        # Ejecutar la secuencia
+
+        pyautogui.press('tab')
+
+        # Pestaña ubicación
+        self.ubicacion(dato)
+
+        # Pasar de ventana
+        pyautogui.press('tab')
+        pyautogui.press('enter')
+        pyautogui.press('tab')
+
+        self.equipament(dato)
+
+
+        messagebox.showinfo(f"{dato['nombre_aula']} creada", f"Aula creada correctamente.")
+
+    def ubicacion(self, dato):
+
+        # Numero edificio
+        if int(dato['numero_edificio']) in self.columnas_info['numero_edificio']:
+            pyautogui.write(f'{dato["numero_edificio"]}')
+
+        # Siguiente
+        pyautogui.press('tab')
+
+        # Lógica edificio con modulos
+        if dato['edificio_con_modulos'].lower() == "no":
+            pyautogui.press('n')
+        else:
+            pyautogui.press('s')
+
+        # Siguiente
+        pyautogui.press('tab')
+
+        # Planta
+        print(dato['planta'])
+        if int(dato['planta']) > 0:
+            print('entrando en planta')
+            pyautogui.write(f'{dato["planta"]}')
+        elif int(dato['planta']) == -1:
+            pyautogui.press('-')
+        elif int(dato['planta']) == -2:
+            pyautogui.press('-')
+            pyautogui.press('-')
+        elif int(dato['planta']) == -3:
+            pyautogui.press('-')
+            pyautogui.press('-')
+            pyautogui.press('-')
+
+        pyautogui.press('tab')
+
+        # Etapa
+        pyautogui.press(f'{dato["etapa"][0]}')
+
+        pyautogui.press('tab')
+
+        # Nombre aula
+        pyautogui.write(f'{dato['nombre_aula']}')
+
+
+    def equipament(self, dato):
+
+        # Panel
+        pyautogui.write(f'{dato["panel"][11]}')
+
+        pyautogui.press('tab')
+
+        # Tipo soporte
+        print(dato['tipo_soporte'])
+        if dato['tipo_soporte']:
+            # Paret FIX
+            if dato['tipo_soporte'] == 'Paret FIX' or dato['tipo_soporte'] == 'Suport de paret fixe - LP4390F-B':
+                pyautogui.press('p')
+                pyautogui.press('p')
+            # Paret Regulable
+            elif dato['tipo_soporte'] == 'Paret Regulable' or dato['tipo_soporte'] == 'Suport de paret regulable - LPHA7090':
+                pyautogui.press('r')
+            # Rodes FIX
+            elif dato['tipo_soporte'] == 'SUPORT AMB RODES FIXE - FS20200M-B':
+                pyautogui.press('a')
+            # Rodes Regulable
+            elif dato['tipo_soporte'] == 'Suport amb rodes regulable - FS20404HM-B':
+                pyautogui.press('r')
+                pyautogui.press('r')
+            else:
+                pyautogui.press('p')
+
+        pyautogui.press('tab')
+
+        print((dato['tipo_pared'][:2]))
+        # Pared
+        if dato['tipo_pared']:
+            # Totxo
+            if dato['tipo_pared'][:2].lower() == 'to':
+                pyautogui.press('t')
+            # Formigó
+            elif dato['tipo_pared'][:2].lower() == 'fo':
+                pyautogui.press('f')
+            # Pladur
+            elif dato['tipo_pared'][:2].lower() == 'pl':
+                pyautogui.press('p')
+                pyautogui.press('p')
+            # Piedra
+            elif dato['tipo_pared'][:2].lower() == 'pe':
+                pyautogui.press('p')
+            # Mòdul
+            elif dato['tipo_pared'][:2].lower() == 'mo':
+                pyautogui.press('m')
+            # Rajola
+            elif dato['tipo_pared'][:2].lower() == 'ra':
+                pyautogui.press('r')
+            else:
+                
+                pyautogui.press('s')

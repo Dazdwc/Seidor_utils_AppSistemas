@@ -1,13 +1,16 @@
+import time
 import tkinter as tk
-from AppSistemas.Herramienta_Desarrollo.modelo.Modelo import ImageConverterService, ExcelService, ExtractorService
+from AppSistemas.Herramienta_Desarrollo.modelo.Modelo import ImageConverterService, ExcelService, ExtractorService, AutomationService
 from AppSistemas.Herramienta_Desarrollo.vista.Vista import MainView, HerramientasReplanteo, HerramientasInstalacion, \
-    FormateadorImagenView, CheckActaView, CrearComentarioView
+    FormateadorImagenView, CheckActaView, CrearComentarioView, AutomatizarTeclasView
 from tkinter import filedialog, messagebox
 
 class MainController:
     def __init__(self):
         self.image_converter_service = ImageConverterService()
         self.excel_service = ExcelService()
+        self.extractor_service = ExtractorService()
+        self.automation_service = AutomationService()
         self.main_view = MainView(self)
 
         self.tool1_view = None
@@ -17,6 +20,7 @@ class MainController:
         self.firmar_documento_view = None
         self.validar_y_firmar_view = None
         self.check_comentarios_view = None
+        self.automatizar_teclas_view = None
 
     def run(self):
         self.main_view.mainloop()
@@ -131,7 +135,7 @@ class MainController:
         if ruta_archivo:
             ruta_destino = ExtractorService.solicitar_destino(self)
             if ruta_destino:
-                datos, nombre_centro, codigo_centro = ExtractorService.extraer_informacion(self, ruta_archivo, tipo)
+                datos, nombre_centro, codigo_centro, tipo = ExtractorService.extraer_informacion(self, ruta_archivo, tipo)
                 if datos:
                     ExtractorService.crear_nuevo_archivo(self, datos, nombre_centro, codigo_centro, ruta_destino, tipo)
                 else:
@@ -166,3 +170,22 @@ class MainController:
                 messagebox.showinfo("Información", "📝 ¡Documento validado y firmado con éxito! 📝")
             else:
                 messagebox.showwarning("Advertencia", "Por favor, seleccione un archivo Excel primero.")
+
+    def automatizar_teclas(self):
+        datos = self.automation_service.automatizar_teclas()
+        if datos:
+            self.automatizar_teclas_view = AutomatizarTeclasView(self, datos)
+            self.automatizar_teclas_view.lift()
+
+    def ejecutar_macro(self, dato, item_id, view):
+        if view.tree.set(item_id, 'Realizada') == '✓':
+            respuesta = messagebox.askyesno("Confirmación", "La macro ya se ha ejecutado para esta fila. ¿Desea volver a aplicarla?")
+            if not respuesta:
+                return
+
+        aviso = messagebox.showinfo("Aviso", "Tienes 5 segundos para situarte en la pantalla adecuada después de aceptar este mensaje.")
+        time.sleep(5)  # Pausa de 5 segundos para que el usuario se sitúe en la pantalla
+
+        self.automation_service.procesar_datos(dato)
+        # Actualizar la vista para mostrar que la macro se ha ejecutado
+        view.tree.set(item_id, 'Realizada', '✓')

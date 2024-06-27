@@ -41,6 +41,7 @@ class MainView(tk.Tk):
             {'text': "Herramientas para Instalación", 'command': self.controller.open_tool2, 'background': "#77DD77"},
             {'text': "Cambiar formato de imagen masivo", 'command': self.controller.formatear_imagen, 'background': "#FFB347"},
             #{'text': "Completar y firmar", 'command': self.controller.check_acta, 'background': "#F231F2"},
+            {'text': "Automatizar Teclas", 'command': self.controller.automatizar_teclas, 'background': "#FFD700"},
             {'text': "Generar Comentario acta", 'command': self.controller.comentarios, 'background': "#F231F2"}
         ]
 
@@ -442,3 +443,45 @@ class CrearComentarioView(tk.Toplevel):
 
         # Mostrar aviso de copiado
         self.label_aviso.config(text="Resumen del material copiado al portapapeles")
+
+
+class AutomatizarTeclasView(tk.Toplevel):
+    def __init__(self, controller, datos):
+        super().__init__()
+        self.controller = controller
+        self.datos = datos
+        self.title("Automatizar Teclas")
+        self.geometry(tamaño_herramientas)
+        self.resizable(True, True)
+
+        self.create_widgets()
+
+    def create_widgets(self):
+        columns = [
+            'codigo_centro', 'nombre_centro', 'codigo_nombre_centro', 'nombre_aula',
+            'numero_edificio', 'planta', 'etapa', 'edificio_con_modulos',
+            'panel', 'tipo_soporte', 'el_soporte_es_diferente', 'tipo_pared',
+            'presa_electrica', 'red', 'Activar Macro', 'Realizada'
+        ]
+
+        self.tree = ttk.Treeview(self, columns=columns, show='headings')
+        for col in columns:
+            self.tree.heading(col, text=col)
+            self.tree.column(col, width=100)
+
+        for dato in self.datos:
+            values = [dato[col] for col in columns[:-2]]  # Exclude 'Activar Macro' and 'Realizada' columns
+            values.append("▶️")
+            values.append("")  # Initially, the 'Realizada' column is empty
+            self.tree.insert('', 'end', values=values)
+
+        self.tree.pack(expand=True, fill=tk.BOTH)
+
+        # Añadir un botón de Play
+        self.tree.bind('<Double-1>', self.on_double_click)
+
+    def on_double_click(self, event):
+        item = self.tree.selection()[0]
+        values = self.tree.item(item, 'values')
+        dato = {col: values[idx] for idx, col in enumerate(self.tree['columns'][:-2])}
+        self.controller.ejecutar_macro(dato, item, self)
