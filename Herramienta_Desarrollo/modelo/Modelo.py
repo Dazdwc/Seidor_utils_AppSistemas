@@ -454,5 +454,5 @@ class AutomationService:
             elif dato['tipo_pared'][:2].lower() == 'ra':
                 pyautogui.press('r')
             else:
-                
+
                 pyautogui.press('s')
