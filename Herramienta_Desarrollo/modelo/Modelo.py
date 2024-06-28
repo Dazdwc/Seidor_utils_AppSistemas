@@ -1,3 +1,5 @@
+import time
+
 import pyautogui
 from PIL import Image
 import openpyxl
@@ -127,7 +129,6 @@ class ExcelService:
 
         except Exception as e:
             print(f"Ha ocurrido un error: {e}")
-        print(resultado)
         return resultado
 
     def comentario_automatico(self, ruta_archivo, replanteo=False):
@@ -136,7 +137,6 @@ class ExcelService:
 
         # Si replanteo es False, agregar los textos específicos en la primera hoja
         if not replanteo:
-            print("Tendría que ser Instalación")
             ws = wb[wb.sheetnames[0]]
             for row in ws.iter_rows(min_col=1, max_col=1, min_row=1, max_row=ws.max_row):
                 for cell in row:
@@ -347,15 +347,10 @@ class AutomationService:
 
         # Pestaña ubicación
         self.ubicacion(dato)
+        self.equipament(dato)
+        self.finalizar()
 
         # Pasar de ventana
-        pyautogui.press('tab')
-        pyautogui.press('enter')
-        pyautogui.press('tab')
-
-        self.equipament(dato)
-
-
         messagebox.showinfo(f"{dato['nombre_aula']} creada", f"Aula creada correctamente.")
 
     def ubicacion(self, dato):
@@ -377,9 +372,7 @@ class AutomationService:
         pyautogui.press('tab')
 
         # Planta
-        print(dato['planta'])
-        if int(dato['planta']) > 0:
-            print('entrando en planta')
+        if int(dato['planta']) >= 0:
             pyautogui.write(f'{dato["planta"]}')
         elif int(dato['planta']) == -1:
             pyautogui.press('-')
@@ -401,8 +394,15 @@ class AutomationService:
         # Nombre aula
         pyautogui.write(f'{dato['nombre_aula']}')
 
+        # Pasar de ventana
+        pyautogui.press('tab')
+        pyautogui.press('enter')
+        pyautogui.press('tab')
+
 
     def equipament(self, dato):
+        metros_de_red = None
+        amb_rodes = False
 
         # Panel
         pyautogui.write(f'{dato["panel"][11]}')
@@ -410,7 +410,6 @@ class AutomationService:
         pyautogui.press('tab')
 
         # Tipo soporte
-        print(dato['tipo_soporte'])
         if dato['tipo_soporte']:
             # Paret FIX
             if dato['tipo_soporte'] == 'Paret FIX' or dato['tipo_soporte'] == 'Suport de paret fixe - LP4390F-B':
@@ -422,16 +421,17 @@ class AutomationService:
             # Rodes FIX
             elif dato['tipo_soporte'] == 'SUPORT AMB RODES FIXE - FS20200M-B':
                 pyautogui.press('a')
+                amb_rodes = True
             # Rodes Regulable
             elif dato['tipo_soporte'] == 'Suport amb rodes regulable - FS20404HM-B':
                 pyautogui.press('r')
                 pyautogui.press('r')
+                amb_rodes = True
             else:
                 pyautogui.press('p')
 
         pyautogui.press('tab')
 
-        print((dato['tipo_pared'][:2]))
         # Pared
         if dato['tipo_pared']:
             # Totxo
@@ -456,3 +456,104 @@ class AutomationService:
             else:
 
                 pyautogui.press('s')
+
+        pyautogui.press('tab')
+
+        # Fuetó
+        if dato['red'][:2] == 'NO':
+            pyautogui.press('n')
+        elif dato['red'][:2] == 'SI':
+            if dato['red'][3:].strip().lower() == '1m':
+                metros_de_red = 1
+                pyautogui.press('f')
+            elif dato['red'][3:].strip().lower() == '3m':
+                metros_de_red = 3
+                pyautogui.press('f')
+                pyautogui.press('f')
+                pyautogui.press('f')
+            elif dato['red'][3:].strip().lower() == '5m':
+                metros_de_red = 5
+                pyautogui.press('f')
+                pyautogui.press('f')
+                pyautogui.press('f')
+                pyautogui.press('f')
+            else:
+                red = dato['red'][3:].strip().lower()
+                metros_de_red = red[:-1]
+                pyautogui.press('f')
+                pyautogui.press('f')
+
+        pyautogui.press('tab')
+
+        if dato['presa_electrica'][:2] == 'NO':
+            metros_electrica = None
+        elif dato['presa_electrica'][:2] == 'SI':
+            pyautogui.press('space')
+            if dato['presa_electrica'][3:].strip().lower() == '1m':
+                metros_electrica = 1
+            elif dato['presa_electrica'][3:].strip().lower() == '2m':
+                metros_electrica = 2
+            elif dato['presa_electrica'][3:].strip().lower() == '3m':
+                metros_electrica = 3
+            elif dato['presa_electrica'][3:].strip().lower() == '5m':
+                metros_electrica = 5
+            else:
+                metros_electrica = 10
+            pyautogui.press('tab')
+            pyautogui.write(f'{metros_electrica}')
+
+        pyautogui.press('tab')
+
+        # Colocar metros de red
+        if metros_de_red:
+            pyautogui.press('space')
+            pyautogui.press('tab')
+            pyautogui.write(f'{metros_de_red}')
+
+        pyautogui.press('tab')
+        pyautogui.press('tab')
+        pyautogui.press('tab')
+        pyautogui.press('tab')
+
+        if amb_rodes:
+            pyautogui.press('space')
+            pyautogui.press('tab')
+            pyautogui.press('p')
+
+        pyautogui.press('tab')
+        pyautogui.press('tab')
+        pyautogui.press('space')
+
+    def finalizar(self):
+
+        pyautogui.press('tab')
+
+        # Sense Adequació
+        pyautogui.press('s')
+        pyautogui.press('tab')
+        pyautogui.press('tab')
+        pyautogui.press('tab')
+        pyautogui.press('tab')
+        pyautogui.press('tab')
+
+        # Centre sense trasllat
+        pyautogui.press('c')
+
+        #siguiente ventana
+        pyautogui.press('tab')
+        pyautogui.press('tab')
+        pyautogui.press('space')
+
+        #finalizar
+        # siguiente ventana
+        pyautogui.press('tab')
+        pyautogui.press('tab')
+        pyautogui.press('tab')
+        pyautogui.press('space')
+
+        #siguiente ventana
+        pyautogui.press('tab')
+        pyautogui.press('tab')
+
+
+
