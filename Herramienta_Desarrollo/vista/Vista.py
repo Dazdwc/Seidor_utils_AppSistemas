@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import ttk
+from tkinter import ttk, messagebox
 from tkinter.scrolledtext import ScrolledText
 
 tamaño_main = ""
@@ -485,3 +485,10 @@ class AutomatizarTeclasView(tk.Toplevel):
         values = self.tree.item(item, 'values')
         dato = {col: values[idx] for idx, col in enumerate(self.tree['columns'][:-2])}
         self.controller.ejecutar_macro(dato, item, self)
+
+
+def show_error_message(message):
+    root = tk.Tk()
+    root.withdraw()  # Oculta la ventana principal
+    messagebox.showerror("Error de Licencia", message)
+    root.destroy()
