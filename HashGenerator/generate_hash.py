@@ -2,7 +2,7 @@ from AppSistemas.Herramienta_Desarrollo.LicenseManager import LicenseManager
 import os
 
 if __name__ == "__main__":
-    secret_key = "Beta.01_7_2024"
+    secret_key = "Beta.02_7_2024"
 
     # Pedir al usuario la cantidad de días de validez
     try:

@@ -61,6 +61,7 @@ class MainController:
             self.formateador_imagen_view.barra_directorio.delete(0, tk.END)
             self.formateador_imagen_view.barra_directorio.insert(0, directorio_seleccionado)
             self.formateador_imagen_view.barra_directorio.configure(state='readonly')
+            self.formateador_imagen_view.directorio_seleccionado = directorio_seleccionado  # Actualiza el atributo
 
     def convertir_imagenes(self):
         if self.formateador_imagen_view and hasattr(self.formateador_imagen_view, 'directorio_seleccionado') and self.formateador_imagen_view.directorio_seleccionado:

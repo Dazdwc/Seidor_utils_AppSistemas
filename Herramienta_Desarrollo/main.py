@@ -18,7 +18,7 @@ def resource_path(relative_path):
 
 if __name__ == "__main__":
     # Configuración del LicenseManager
-    secret_key = "Beta.01_7_2024"
+    secret_key = "Beta.02_7_2024"
     # Asegurarse de que la ruta al hash.txt es correcta
     hash_file_path = resource_path("hash.txt")
     license_manager = LicenseManager.LicenseManager(secret_key, hash_file_path=hash_file_path)

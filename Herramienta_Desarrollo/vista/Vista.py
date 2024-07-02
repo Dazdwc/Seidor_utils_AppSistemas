@@ -2,14 +2,16 @@ import tkinter as tk
 from tkinter import ttk, messagebox
 from tkinter.scrolledtext import ScrolledText
 
-tamaño_main = ""
-tamaño_herramientas = ""
+tamano_main = ""
+tamano_herramientas = ""
+
+
 class MainView(tk.Tk):
     def __init__(self, controller):
         super().__init__()
         self.controller = controller
         self.title("Herramientas Para Actas")
-        self.geometry(tamaño_main)
+        self.geometry(tamano_main)
         self.resizable(False, False)
 
         # Estilo de la aplicación
@@ -37,12 +39,12 @@ class MainView(tk.Tk):
 
         # Botones con colores pastel
         button_styles = [
-            {'text': "Herramientas para replanteo", 'command': self.controller.open_tool1, 'background': "#AEC6CF"},
-            {'text': "Herramientas para Instalación", 'command': self.controller.open_tool2, 'background': "#77DD77"},
-            {'text': "Cambiar formato de imagen masivo", 'command': self.controller.formatear_imagen, 'background': "#FFB347"},
+            {'text': "Herramientas para Replanteo", 'command': self.controller.open_tool1, 'background': "#c8e78b"},
+            {'text': "Herramientas para Instalación", 'command': self.controller.open_tool2, 'background': "#fcccdb"},
+            {'text': "Cambiar formato de imagen masivo", 'command': self.controller.formatear_imagen, 'background': "#ffda9e"},
             #{'text': "Completar y firmar", 'command': self.controller.check_acta, 'background': "#F231F2"},
-            {'text': "Automatizar Teclas", 'command': self.controller.automatizar_teclas, 'background': "#FFD700"},
-            {'text': "Generar Comentario acta", 'command': self.controller.comentarios, 'background': "#F231F2"}
+            #{'text': "Automatizar Teclas", 'command': self.controller.automatizar_teclas, 'background': "#FFD700"},
+            {'text': "Generar Comentario acta", 'command': self.controller.comentarios, 'background': "#d8edf9"}
         ]
 
         for i, style in enumerate(button_styles, start=1):
@@ -59,7 +61,7 @@ class HerramientasReplanteo(tk.Toplevel):
         super().__init__()
         self.controller = controller
         self.title("Herramientas para replanteo")
-        self.geometry(tamaño_herramientas)
+        self.geometry(tamano_herramientas)
         self.resizable(False, False)
 
         # Estilo de la nueva ventana
@@ -77,41 +79,39 @@ class HerramientasReplanteo(tk.Toplevel):
 
         boton_para_todo = tk.Button(
             tool_frame,
-            text="Firmar y Comentar 📝",
+            text="Firmar y Comentar Replanteo 📝",
             command=lambda: self.controller.boton_para_todo(replanteo=True),
-            bg="#85E3FF",  # Color de fondo
-            fg="white",  # Color de texto blanco
+            bg="#89a850",  # Color de fondo
+            fg="#f8f9fa",  # Color de texto blanco
             font=('Helvetica', 14, 'bold'),  # Fuente más grande y en negrita
-            bd=5,  # Borde más grueso
-            relief='raised'  # Relieve elevado
         )
         boton_para_todo.pack(pady=20)
+
+        separator = ttk.Separator(tool_frame, orient='horizontal')
+        separator.pack(fill='x', pady=10)
 
         boton_extractor = tk.Button(
             tool_frame,
             text="Relacion Alias/Aula",
             command=self.controller.relacion_nombre_aula_replanteo,
-            bg="#A6CD61",  # Color de fondo
+            bg="#def8a9",  # Color de fondo
         )
         boton_extractor.pack(pady=20)
 
-        separator = ttk.Separator(tool_frame, orient='horizontal')
-        separator.pack(fill='x', pady=10)
-
         # Botón para seleccionar archivo
-        boton_seleccionar = tk.Button(
-            tool_frame,
-            text="Firmar documento",
-            command=self.controller.firmar_documento
-        )
-        boton_seleccionar.pack(pady=20)
-
-        boton_comentario = tk.Button(
-            tool_frame,
-            text="Comentarios automáticos",
-            command=lambda: self.controller.comentarios_automatiocs_replanteo(True)
-        )
-        boton_comentario.pack(pady=20)
+        # boton_seleccionar = tk.Button(
+        #     tool_frame,
+        #     text="Firmar documento",
+        #     command=self.controller.firmar_documento
+        # )
+        # boton_seleccionar.pack(pady=20)
+        #
+        # boton_comentario = tk.Button(
+        #     tool_frame,
+        #     text="Comentarios automáticos",
+        #     command=lambda: self.controller.comentarios_automatiocs_replanteo(True)
+        # )
+        # boton_comentario.pack(pady=20)
 
 
 class HerramientasInstalacion(tk.Toplevel):
@@ -119,7 +119,7 @@ class HerramientasInstalacion(tk.Toplevel):
         super().__init__()
         self.controller = controller
         self.title("Herramientas para Instalación")
-        self.geometry(tamaño_herramientas)
+        self.geometry(tamano_herramientas)
         self.resizable(False, False)
 
         # Estilo de la nueva ventana
@@ -132,18 +132,16 @@ class HerramientasInstalacion(tk.Toplevel):
         tool_frame.pack(expand=True, fill='both')
 
         # Etiqueta con el mensaje
-        label = ttk.Label(tool_frame, text="Bienvenido a las herramientas para instalación.", style='TLabel', wraplength=350)
+        label = ttk.Label(tool_frame, text="Bienvenido a las herramientas para Instalación.", style='TLabel', wraplength=350)
         label.pack(pady=20, padx=20)
 
         boton_para_todo = tk.Button(
             tool_frame,
-            text="Firmar y Comentar 📝",
+            text="Firmar y Comentar Instalación 📝",
             command=lambda: self.controller.boton_para_todo(False),
-            bg="#FFABAB",  # Color de fondo
-            fg="white",  # Color de texto blanco
+            bg="#e690af",  # Color de fondo
+            fg="#f8f9fa",  # Color de texto blanco
             font=('Helvetica', 14, 'bold'),  # Fuente más grande y en negrita
-            bd=5,  # Borde más grueso
-            relief='raised'  # Relieve elevado
         )
         boton_para_todo.pack(pady=20)
 
@@ -151,23 +149,22 @@ class HerramientasInstalacion(tk.Toplevel):
             tool_frame,
             text="Relacion Alias/Aula",
             command=self.controller.relacion_nombre_aula_instalacion,
-            bg="#A6CD61",  # Color de fondo
+            bg="#fdc9d9",  # Color de fondo
         )
         boton_extractor.pack(pady=20)
 
-        boton_seleccionar = tk.Button(
-            tool_frame,
-            text="Validar y firmar",
-            command=self.controller.validar_y_firmar)
-        boton_seleccionar.pack(pady=20)
+        #boton_seleccionar = tk.Button(
+        #    tool_frame,
+        #    text="Validar y firmar",
+        #    command=self.controller.validar_y_firmar)
+        #boton_seleccionar.pack(pady=20)
 
-        boton_comentario = tk.Button(
-            tool_frame,
-            text="Comentarios automáticos",
-            command=lambda: self.controller.comentarios_automatiocs_replanteo(False)
-        )
-        boton_comentario.pack(pady=20)
-
+        #boton_comentario = tk.Button(
+        #    tool_frame,
+        #    text="Comentarios automáticos",
+        #    command=lambda: self.controller.comentarios_automatiocs_replanteo(False)
+        #)
+        #boton_comentario.pack(pady=20)
 
 
 class FormateadorImagenView(tk.Toplevel):
@@ -175,8 +172,9 @@ class FormateadorImagenView(tk.Toplevel):
         super().__init__()
         self.controller = controller
         self.title("Cambiar formato de imagen masivo")
-        self.geometry(tamaño_herramientas)
+        self.geometry(tamano_herramientas)
         self.resizable(False, False)
+        self.directorio_seleccionado = None  # Inicializar el atributo aquí
 
         # Etiqueta de título
         self.etiqueta_titulo = tk.Label(self, text="Conversor de Imágenes", font=("Arial", 18), bg="#f0f0f0",
@@ -235,7 +233,7 @@ class CheckActaView(tk.Toplevel):
         super().__init__()
         self.controller = controller
         self.title("Completar y firmar")
-        self.geometry(tamaño_herramientas)
+        self.geometry(tamano_herramientas)
         self.resizable(False, False)
 
         # Estilo de la nueva ventana
@@ -292,10 +290,10 @@ class CrearComentarioView(tk.Toplevel):
         acta_frame = ttk.Frame(tool_frame, style='TFrame')
         acta_frame.pack(anchor='w', pady=5)
 
-        ttk.Radiobutton(acta_frame, text="Acta de replanteo", variable=self.tipo_acta, value="replanteo",
-                        style='TRadiobutton').pack(side='left')
-        ttk.Radiobutton(acta_frame, text="Acta de instalación", variable=self.tipo_acta, value="instalacion",
-                        style='TRadiobutton').pack(side='left')
+        #ttk.Radiobutton(acta_frame, text="Acta de replanteo", variable=self.tipo_acta, value="replanteo",
+                        #style='TRadiobutton').pack(side='left')
+        #ttk.Radiobutton(acta_frame, text="Acta de instalación", variable=self.tipo_acta, value="instalacion",
+                        #style='TRadiobutton').pack(side='left')
 
         # Variable para la opción "soporte con rodes"
         self.soporte_con_ruedas = tk.BooleanVar()
@@ -491,7 +489,7 @@ class AutomatizarTeclasView(tk.Toplevel):
         self.controller = controller
         self.datos = datos
         self.title("Automatizar Teclas")
-        self.geometry(tamaño_herramientas)
+        self.geometry(tamano_herramientas)
         self.resizable(True, True)
 
         self.create_widgets()

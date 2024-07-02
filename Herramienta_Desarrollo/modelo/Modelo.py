@@ -3,7 +3,7 @@ import time
 import pyautogui
 from PIL import Image
 import openpyxl
-import imageio.v2 as imageio
+import imageio
 from tkinter import messagebox, filedialog
 import os
 
@@ -12,7 +12,7 @@ from openpyxl.workbook import Workbook
 # Diccionario de coherencia
 coherencia_dict = {
     "SENSE ADEQUACIÓ": "CENTRE (SENSE TRASLLAT)",
-    "KIT PROYECCIÓ": "CENTRE (SENSE TRASLLAT)",
+    "KIT PROJECCIÓ": "CENTRE (SENSE TRASLLAT)",
     "PANEL INTERACTIU": "CENTRE (SENSE TRASLLAT)",
     "PISSARRA": "CENTRE (SENSE TRASLLAT)",
     "PROYECTOR": "CENTRE (SENSE TRASLLAT)",
@@ -23,19 +23,36 @@ mensaje_dict = {
     "SENSE ADEQUACIÓ": "Resum del material a retirar: No es fa retirada perquè es monta suport amb rodes.",
     "OTROS": "La destinació de tots el elements a retirar és CENTRE (SENSE TRASLLAT)."
 }
+
+
 class ImageConverterService:
     def convertir_imagenes_en_directorio(self, directorio, formato_salida, barra_progreso, ventana):
         try:
             archivos = self._obtener_archivos_validos(directorio)
             total_archivos = len(archivos)
             barra_progreso["maximum"] = total_archivos
+            errores = []
 
             for indice, archivo in enumerate(archivos, start=1):
-                self._convertir_imagen(archivo, formato_salida)
-                barra_progreso["value"] = indice
-                ventana.update_idletasks()
+                try:
+                    self._convertir_imagen(archivo, formato_salida)
+                except Exception as e:
+                    errores.append(f"{archivo}")
+                finally:
+                    barra_progreso["value"] = indice
+                    ventana.update_idletasks()
 
-            messagebox.showinfo("Completado", f"Se han convertido {total_archivos} imágenes exitosamente.")
+            fotos_convertidas = total_archivos - len(errores)
+            if errores:
+                errores_mensaje = "\n".join(errores)
+                messagebox.showerror(
+                    "Errores de conversión",
+                    f"Se han convertido {fotos_convertidas} de {total_archivos} imágenes."
+                    f"\nLas siguientes imágenes no se han podido convertir debido a un problema de corrupción de datos:"
+                    f"\n{errores_mensaje}\nProceda a recorte manual.")
+            else:
+                messagebox.showinfo("Completado",
+                                    f"Se han convertido {fotos_convertidas} de {total_archivos} imágenes exitosamente.")
         except Exception as e:
             messagebox.showerror("Error", f"Error al convertir imágenes: {e}")
 
@@ -53,12 +70,14 @@ class ImageConverterService:
 
         try:
             if extension_archivo.lower() == '.heic':
-                # Lee el número de fotogramas en la imagen HEIC
-                num_fotogramas = imageio.get_reader(ruta_archivo).get_length()
-                if num_fotogramas == 0:
-                    messagebox.showwarning("Advertencia", "La imagen HEIC no contiene ningún fotograma.")
-                    return
-                imagen = imageio.imread(ruta_archivo)
+                try:
+                    num_fotogramas = imageio.get_reader(ruta_archivo).get_length()
+                    if num_fotogramas == 0:
+                        raise ValueError("La imagen HEIC no contiene ningún fotograma.")
+                    imagen = imageio.imread(ruta_archivo)
+                except Exception as e:
+                    raise ValueError(f"Error al leer la imagen HEIC: {e}")
+
                 imagen = Image.fromarray(imagen)
                 imagen = imagen.convert("RGB")
             else:
@@ -71,7 +90,7 @@ class ImageConverterService:
                 os.remove(ruta_archivo)
 
         except Exception as e:
-            messagebox.showerror("Error", f"Error al convertir la imagen: {e}")
+            raise RuntimeError(f"Error al convertir la imagen {ruta_archivo}: {e}")
 
 
 class ExcelService:
@@ -184,6 +203,7 @@ class ExcelService:
         # Guardar los cambios en el archivo Excel
         wb.save(ruta_archivo)
         return True
+
 
 class ExtractorService:
 
