@@ -78,7 +78,7 @@ class HerramientasReplanteo(tk.Toplevel):
         boton_para_todo = tk.Button(
             tool_frame,
             text="Firmar y Comentar 📝",
-            command=lambda: self.controller.boton_para_todo(True),
+            command=lambda: self.controller.boton_para_todo(replanteo=True),
             bg="#85E3FF",  # Color de fondo
             fg="white",  # Color de texto blanco
             font=('Helvetica', 14, 'bold'),  # Fuente más grande y en negrita
@@ -112,9 +112,6 @@ class HerramientasReplanteo(tk.Toplevel):
             command=lambda: self.controller.comentarios_automatiocs_replanteo(True)
         )
         boton_comentario.pack(pady=20)
-
-
-
 
 
 class HerramientasInstalacion(tk.Toplevel):

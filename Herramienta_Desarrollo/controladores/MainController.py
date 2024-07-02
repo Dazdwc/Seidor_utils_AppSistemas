@@ -93,8 +93,9 @@ class MainController:
 
         if ruta_archivo:
             celdas = self.excel_service.encontrar_celdas_para_firmar_en_acta(ruta_archivo)
+            firmado = self.excel_service.firmar_acta(ruta_archivo, celdas)
 
-            if self.excel_service.firmar_acta(ruta_archivo, celdas) and not importa_ruta:
+            if firmado and not importa_ruta:
                 messagebox.showinfo(message="¡Documento firmado! 📝")
             elif importa_ruta:
                 return True
@@ -149,8 +150,10 @@ class MainController:
             ruta_archivo = filedialog.askopenfilename(title="Selecciona un acta de replanteo")
         else:
             ruta_archivo = filedialog.askopenfilename(title="Selecciona un acta de instalación")
+
         if ruta_archivo:
-            if self.excel_service.comentario_automatico(ruta_archivo, replanteo):
+            comentado = self.excel_service.comentario_automatico(ruta_archivo, replanteo)
+            if comentado:
                 messagebox.showinfo("Información", "📝 Comentarios Puestos con éxito 📝")
             else:
                 messagebox.showwarning("Advertencia", "Por favor, seleccione un archivo Excel primero.")
@@ -159,6 +162,7 @@ class MainController:
     def boton_para_todo(self, replanteo=False):
         if replanteo:
             ruta, ok = self.comentarios_automatiocs_replanteo(True)
+
             if self.firmar_documento(ruta) and ok:
                 messagebox.showinfo("Información", "📝 ¡Documento validado y firmado con éxito! 📝")
             else:
@@ -179,11 +183,17 @@ class MainController:
 
     def ejecutar_macro(self, dato, item_id, view):
         if view.tree.set(item_id, 'Realizada') == '✓':
-            respuesta = messagebox.askyesno("Confirmación", "La macro ya se ha ejecutado para esta fila. ¿Desea volver a aplicarla?")
+            respuesta = messagebox.askyesno(
+                "Confirmación",
+                "La macro ya se ha ejecutado para esta fila. ¿Desea volver a aplicarla?"
+            )
             if not respuesta:
                 return
 
-        aviso = messagebox.showinfo("Aviso", "Tienes 5 segundos para situarte en la pantalla adecuada después de aceptar este mensaje.")
+        aviso = messagebox.showinfo(
+            "Aviso",
+            "Tienes 5 segundos para situarte en la pantalla adecuada después de aceptar este mensaje."
+        )
         time.sleep(5)  # Pausa de 5 segundos para que el usuario se sitúe en la pantalla
 
         self.automation_service.procesar_datos(dato)

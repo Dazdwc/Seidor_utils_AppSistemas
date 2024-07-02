@@ -3,7 +3,7 @@ import time
 import pyautogui
 from PIL import Image
 import openpyxl
-import imageio
+import imageio.v2 as imageio
 from tkinter import messagebox, filedialog
 import os
 
@@ -11,7 +11,7 @@ from openpyxl.workbook import Workbook
 
 # Diccionario de coherencia
 coherencia_dict = {
-    "SENSE ADEQUACIÓ": "NO APLICA",
+    "SENSE ADEQUACIÓ": "CENTRE (SENSE TRASLLAT)",
     "KIT PROYECCIÓ": "CENTRE (SENSE TRASLLAT)",
     "PANEL INTERACTIU": "CENTRE (SENSE TRASLLAT)",
     "PISSARRA": "CENTRE (SENSE TRASLLAT)",
