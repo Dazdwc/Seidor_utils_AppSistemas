@@ -288,6 +288,18 @@ class CrearComentarioView(tk.Toplevel):
         tool_frame = ttk.Frame(self, padding=(20, 10, 20, 10), style='TFrame')
         tool_frame.pack(expand=True, fill='both')
 
+        # Variables para el tipo de acta
+        self.tipo_acta = tk.StringVar(value="replanteo")
+
+        # Botones de radio para seleccionar el tipo de acta
+        acta_frame = ttk.Frame(tool_frame, style='TFrame')
+        acta_frame.pack(anchor='w', pady=5)
+
+        ttk.Radiobutton(acta_frame, text="Acta de replanteo", variable=self.tipo_acta, value="replanteo",
+                        style='TRadiobutton').pack(side='left')
+        ttk.Radiobutton(acta_frame, text="Acta de instalación", variable=self.tipo_acta, value="instalacion",
+                        style='TRadiobutton').pack(side='left')
+
         # Variable para la opción "soporte con rodes"
         self.soporte_con_ruedas = tk.BooleanVar()
         self.soporte_con_ruedas_cb = tk.Checkbutton(tool_frame, text="Soporte con rodes",
@@ -316,7 +328,7 @@ class CrearComentarioView(tk.Toplevel):
 
         # Elementos a seleccionar
         self.items = {
-            "Kit de projecció (projector, pantalla enrotllable i caixa de connexions)": tk.BooleanVar(),
+            "Kit de projecció (projector i caixa de connexions)": tk.BooleanVar(),
             "Altaveus": tk.BooleanVar(),
             "PDI": tk.BooleanVar(),
             "Panell digital antic": tk.BooleanVar(),
@@ -329,14 +341,35 @@ class CrearComentarioView(tk.Toplevel):
         # Crear checkboxes y campos de entrada para cada elemento
         self.checkbuttons = []
         self.entries = {}
+        self.pantalla_enrollable_var = tk.BooleanVar()
+
         for item, var in self.items.items():
             cb = tk.Checkbutton(tool_frame, text=item, variable=var, bg='#f0f0f0', font=('Helvetica', 12),
                                 command=self.toggle_entries)
             cb.pack(anchor='w', pady=2)
             self.checkbuttons.append(cb)
 
-            if item in ["Kit de projecció (projector, pantalla enrotllable i caixa de connexions)", "Altaveus", "PDI",
-                        "Panell digital antic"]:
+            if item == "Kit de projecció (projector i caixa de connexions)":
+                self.pantalla_cb = tk.Checkbutton(tool_frame, text="Pantalla enrotllable",
+                                                  variable=self.pantalla_enrollable_var, bg='#f0f0f0',
+                                                  font=('Helvetica', 12))
+                self.pantalla_cb.pack(anchor='w', padx=20, pady=2)
+                self.pantalla_cb.config(state='disabled')
+
+                entry_frame = ttk.Frame(tool_frame, style='TFrame')
+                entry_frame.pack(anchor='w', pady=2, padx=20)
+
+                ttk.Label(entry_frame, text="Sace:", style='TLabel').pack(side='left')
+                sace_entry = ttk.Entry(entry_frame, state='disabled')
+                sace_entry.pack(side='left', padx=5)
+
+                ttk.Label(entry_frame, text="SN:", style='TLabel').pack(side='left')
+                sn_entry = ttk.Entry(entry_frame, state='disabled')
+                sn_entry.pack(side='left', padx=5)
+
+                self.entries[item] = (sace_entry, sn_entry)
+
+            elif item in ["Altaveus", "PDI", "Panell digital antic"]:
                 entry_frame = ttk.Frame(tool_frame, style='TFrame')
                 entry_frame.pack(anchor='w', pady=2, padx=20)
 
@@ -371,6 +404,7 @@ class CrearComentarioView(tk.Toplevel):
             for entries in self.entries.values():
                 for entry in entries:
                     entry.config(state='disabled')
+            self.pantalla_cb.config(state='disabled')
         else:
             for cb in self.checkbuttons:
                 cb.config(state='normal')
@@ -381,9 +415,13 @@ class CrearComentarioView(tk.Toplevel):
             if self.items[item].get():
                 sace_entry.config(state='normal')
                 sn_entry.config(state='normal')
+                if item == "Kit de projecció (projector i caixa de connexions)":
+                    self.pantalla_cb.config(state='normal')
             else:
                 sace_entry.config(state='disabled')
                 sn_entry.config(state='disabled')
+                if item == "Kit de projecció (projector i caixa de connexions)":
+                    self.pantalla_cb.config(state='disabled')
 
     def toggle_extra_comments(self):
         selected_var = None
@@ -404,8 +442,10 @@ class CrearComentarioView(tk.Toplevel):
                     self.extra_checkbuttons[comment].config(state='disabled')
 
     def generate_comment(self):
+        acta_text = "Resum del material a retirar:" if self.tipo_acta.get() == "replanteo" else "Resum del material retirat:"
+
         if self.soporte_con_ruedas.get():
-            comment1 = "Resum del material a retirar: No es fa retirada perquè es monta suport amb rodes."
+            comment1 = f"{acta_text} No es fa retirada perquè es monta suport amb rodes."
             comment2 = ""
         else:
             selected_items = []
@@ -414,9 +454,12 @@ class CrearComentarioView(tk.Toplevel):
                     sace, sn = self.entries.get(item, (None, None))
                     sace_text = f" Sace( {sace.get()})" if sace and sace.get() else ""
                     sn_text = f" SN( {sn.get()})" if sn and sn.get() else ""
-                    selected_items.append(f"{item}{sace_text}{sn_text}")
+                    item_text = f"{item}{sace_text}{sn_text}"
+                    if item == "Kit de projecció (projector i caixa de connexions)" and self.pantalla_enrollable_var.get():
+                        item_text = "Kit de projecció (projector, pantalla enrotllable i caixa de connexions)"
+                    selected_items.append(item_text)
             if selected_items:
-                comment1 = "Resum del material a retirar: " + ", ".join(selected_items) + "."
+                comment1 = f"{acta_text} " + ", ".join(selected_items) + "."
                 comment2 = "La destinació de tots els elements a retirar és CENTRE (SENSE TRASLLAT)."
             else:
                 comment1 = "No hay elementos seleccionados."
