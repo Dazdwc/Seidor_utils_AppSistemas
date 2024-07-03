@@ -232,15 +232,19 @@ class ExtractorService:
         libro = openpyxl.load_workbook(ruta_archivo, data_only=True)
         datos = []
         hoja1 = libro.worksheets[0]
+        print("tipo: ", tipo)
 
         if tipo == "instalación":
             codigo_centro = hoja1['C13'].value  # Extraer el título de la primera hoja
             nombre_centro = hoja1['F13'].value
-
+            print(codigo_centro, nombre_centro)
             for hoja in libro.worksheets[1:]:
                 C16 = hoja['C19'].value
                 K17 = hoja['M19'].value
-                datos.append((C16, K17))
+                SN = hoja['G24'].value
+                SACE = hoja['K24'].value
+                print(C16, K17, SN, SACE)
+                datos.append((C16, K17, SN, SACE))
 
             return datos, nombre_centro, codigo_centro, tipo
         if tipo == "replanteo":
@@ -260,36 +264,52 @@ class ExtractorService:
         nueva_hoja = nuevo_libro.active
         nueva_hoja.title = "Datos Extraídos"
 
-        # Escribir los títulos en las celdas B2 y C2
-        nueva_hoja['B2'] = "Aula"
-        nueva_hoja['C2'] = "Alias"
-
-        if nombre_centro:
+        if nombre_centro and tipo == "instalación":
+            # Escribir los títulos
+            nueva_hoja['A2'] = "Nombre"
+            nueva_hoja['B2'] = "Aula"
+            nueva_hoja['C2'] = "Alias"
+            nueva_hoja['D2'] = "SN"
+            nueva_hoja['E2'] = "SACE"
             # Escribir los datos en las celdas B1 y C1
-            for index, (b2, c4) in enumerate(datos, start=3):
-                nueva_hoja[f'B{index}'] = b2
-                nueva_hoja[f'C{index}'] = c4
+            for index, (b2, c4, SN, SACE) in enumerate(datos, start=1):
+                if b2 and c4:
+                    nueva_hoja[f'A{index}'] = b2
+                    nueva_hoja[f'B{index}'] = b2[10:]
+                    nueva_hoja[f'C{index}'] = c4
+                    nueva_hoja[f'D{index}'] = SN
+                    nueva_hoja[f'E{index}'] = SACE
 
-            nombre_archivo = ""
-            if tipo == "instalación":
-                nombre_archivo = os.path.join(ruta_destino, f"{codigo_centro}_{nombre_centro}_relación_aula_instalación.xlsx")
-            if tipo == "replanteo":
-                nombre_archivo = os.path.join(ruta_destino, f"{codigo_centro}_{nombre_centro}_relación_aula_replanteo.xlsx")
-            if nombre_archivo == "":
-                messagebox.showwarning("Advertencia", "Error Inesperado.")
-                return False
-            nuevo_libro.save(nombre_archivo)
-            messagebox.showinfo("Éxito", f"Nuevo archivo creado como {nombre_archivo}.")
-
-            # Abrir el archivo recién creado
-            try:
-                os.startfile(nombre_archivo)
-            except AttributeError:
-                # Para sistemas no Windows
-                os.system(f"open {nombre_archivo}")
+        elif nombre_centro and tipo == "replanteo":
+            # Escribir los títulos
+            nueva_hoja['A1'] = "Nombre"
+            nueva_hoja['B1'] = "Aula"
+            for index, (b2, c4) in enumerate(datos, start=1):
+                if b2 and c4:
+                    nueva_hoja[f'A{index}'] = b2
+                    nueva_hoja[f'B{index}'] = c4
         else:
             messagebox.showwarning("Advertencia", "No se encontraron datos para extraer.")
             return False
+
+        nombre_archivo = ""
+        if tipo == "instalación":
+            nombre_archivo = os.path.join(ruta_destino, f"{codigo_centro}_{nombre_centro}_relación_aula_instalación.xlsx")
+        if tipo == "replanteo":
+            nombre_archivo = os.path.join(ruta_destino, f"{codigo_centro}_{nombre_centro}_relación_aula_replanteo.xlsx")
+        if nombre_archivo == "":
+            messagebox.showwarning("Advertencia", "Error Inesperado.")
+            return False
+        nuevo_libro.save(nombre_archivo)
+        messagebox.showinfo("Éxito", f"Nuevo archivo creado como {nombre_archivo}.")
+
+        # Abrir el archivo recién creado
+        try:
+            os.startfile(nombre_archivo)
+        except AttributeError:
+            # Para sistemas no Windows
+            os.system(f"open {nombre_archivo}")
+
 
 
 class AutomationService:
@@ -479,10 +499,11 @@ class AutomationService:
 
         pyautogui.press('tab')
 
+
         # Fuetó
-        if dato['red'][:2] == 'NO':
+        if dato['red'][:2].strip().lower() == 'no':
             pyautogui.press('n')
-        elif dato['red'][:2] == 'SI':
+        elif dato['red'][:2].strip().lower() == 'si':
             if dato['red'][3:].strip().lower() == '1m':
                 metros_de_red = 1
                 pyautogui.press('f')
@@ -498,16 +519,15 @@ class AutomationService:
                 pyautogui.press('f')
                 pyautogui.press('f')
             else:
-                red = dato['red'][3:].strip().lower()
-                metros_de_red = red[:-1]
+                metros_de_red = 20
                 pyautogui.press('f')
                 pyautogui.press('f')
 
         pyautogui.press('tab')
 
-        if dato['presa_electrica'][:2] == 'NO':
+        if dato['presa_electrica'][:2].strip().lower() == 'no':
             metros_electrica = None
-        elif dato['presa_electrica'][:2] == 'SI':
+        elif dato['presa_electrica'][:2].strip().lower() == 'si':
             pyautogui.press('space')
             if dato['presa_electrica'][3:].strip().lower() == '1m':
                 metros_electrica = 1
