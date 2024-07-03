@@ -43,7 +43,7 @@ class MainView(tk.Tk):
             {'text': "Herramientas para Instalación", 'command': self.controller.open_tool2, 'background': "#fcccdb"},
             {'text': "Cambiar formato de imagen masivo", 'command': self.controller.formatear_imagen, 'background': "#ffda9e"},
             #{'text': "Completar y firmar", 'command': self.controller.check_acta, 'background': "#F231F2"},
-            #{'text': "Automatizar Teclas", 'command': self.controller.automatizar_teclas, 'background': "#FFD700"},
+            {'text': "Automatizar Teclas", 'command': self.controller.automatizar_teclas, 'background': "#ffcaaf"},
             {'text': "Generar Comentario acta", 'command': self.controller.comentarios, 'background': "#d8edf9"}
         ]
 
