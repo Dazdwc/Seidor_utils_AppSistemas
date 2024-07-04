@@ -311,7 +311,6 @@ class ExtractorService:
             os.system(f"open {nombre_archivo}")
 
 
-
 class AutomationService:
     def __init__(self):
         self.columnas_info = {
@@ -488,7 +487,7 @@ class AutomationService:
             elif dato['tipo_pared'][:2].lower() == 'pe':
                 pyautogui.press('p')
             # Mòdul
-            elif dato['tipo_pared'][:2].lower() == 'mo':
+            elif dato['tipo_pared'][:2].lower() == 'mo' or 'mò':
                 pyautogui.press('m')
             # Rajola
             elif dato['tipo_pared'][:2].lower() == 'ra':
@@ -499,46 +498,31 @@ class AutomationService:
 
         pyautogui.press('tab')
 
-
         # Fuetó
         if dato['red'][:2].strip().lower() == 'no':
             pyautogui.press('n')
         elif dato['red'][:2].strip().lower() == 'si':
+            metros_de_red = StringService.solo_numeros(dato['red'])
             if dato['red'][3:].strip().lower() == '1m':
-                metros_de_red = 1
                 pyautogui.press('f')
             elif dato['red'][3:].strip().lower() == '3m':
-                metros_de_red = 3
                 pyautogui.press('f')
                 pyautogui.press('f')
                 pyautogui.press('f')
             elif dato['red'][3:].strip().lower() == '5m':
-                metros_de_red = 5
                 pyautogui.press('f')
                 pyautogui.press('f')
                 pyautogui.press('f')
                 pyautogui.press('f')
             else:
-                metros_de_red = 20
                 pyautogui.press('f')
                 pyautogui.press('f')
 
         pyautogui.press('tab')
 
-        if dato['presa_electrica'][:2].strip().lower() == 'no':
-            metros_electrica = None
-        elif dato['presa_electrica'][:2].strip().lower() == 'si':
+        if dato['presa_electrica'][:2].strip().lower() == 'si':
             pyautogui.press('space')
-            if dato['presa_electrica'][3:].strip().lower() == '1m':
-                metros_electrica = 1
-            elif dato['presa_electrica'][3:].strip().lower() == '2m':
-                metros_electrica = 2
-            elif dato['presa_electrica'][3:].strip().lower() == '3m':
-                metros_electrica = 3
-            elif dato['presa_electrica'][3:].strip().lower() == '5m':
-                metros_electrica = 5
-            else:
-                metros_electrica = 10
+            metros_electrica = StringService.solo_numeros(dato['presa_electrica'])
             pyautogui.press('tab')
             pyautogui.write(f'{metros_electrica}')
 
@@ -596,4 +580,9 @@ class AutomationService:
         pyautogui.press('tab')
 
 
+class StringService:
 
+    @staticmethod
+    def solo_numeros(texto_o_lista):
+        texto = texto_o_lista
+        return ''.join([c for c in texto if c.isdigit()])

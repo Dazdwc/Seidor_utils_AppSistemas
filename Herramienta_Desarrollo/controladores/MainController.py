@@ -195,7 +195,7 @@ class MainController:
             "Aviso",
             "Tienes 5 segundos para situarte en la pantalla adecuada después de aceptar este mensaje."
         )
-        time.sleep(5)  # Pausa de 5 segundos para que el usuario se sitúe en la pantalla
+        time.sleep(2)  # Pausa de 5 segundos para que el usuario se sitúe en la pantalla
 
         self.automation_service.procesar_datos(dato)
         # Actualizar la vista para mostrar que la macro se ha ejecutado
