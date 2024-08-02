@@ -115,8 +115,9 @@ class ExcelService:
             datos_instalador = {
                 "DNI": "45489700R",
                 "NOM": "David Quiñonero",
-                "CÀRREC": "Tècnic",
-                "TELÈFON": "647999633"
+                #"CÀRREC": "Tècnic",
+                #"TELÈFON": "647999633"
+                "FECHA": time.strftime("%d/%m/%Y")
             }
 
             for celda, valor in datos_instalador.items():
@@ -145,7 +146,10 @@ class ExcelService:
                         # Obtener la referencia de la celda en la columna G de la misma fila
                         referencia_celda = f"G{celda.row}"
                         resultado[celda.value] = referencia_celda
-
+            if resultado["NOM"]:
+                fecha = int(resultado["NOM"][1:]) + 8
+                resultado["FECHA"] = f"G{fecha}"
+                print(resultado["FECHA"])
         except Exception as e:
             print(f"Ha ocurrido un error: {e}")
         return resultado
@@ -402,7 +406,7 @@ class AutomationService:
         pyautogui.press('tab')
 
         # Lógica edificio con modulos
-        if dato['edificio_con_modulos'].lower() == "no":
+        if dato['edificio_con_modulos'].lower().strip() == "no":
             pyautogui.press('n')
         else:
             pyautogui.press('s')

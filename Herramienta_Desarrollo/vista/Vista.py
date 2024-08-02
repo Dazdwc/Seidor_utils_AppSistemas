@@ -290,10 +290,10 @@ class CrearComentarioView(tk.Toplevel):
         acta_frame = ttk.Frame(tool_frame, style='TFrame')
         acta_frame.pack(anchor='w', pady=5)
 
-        #ttk.Radiobutton(acta_frame, text="Acta de replanteo", variable=self.tipo_acta, value="replanteo",
-                        #style='TRadiobutton').pack(side='left')
-        #ttk.Radiobutton(acta_frame, text="Acta de instalación", variable=self.tipo_acta, value="instalacion",
-                        #style='TRadiobutton').pack(side='left')
+        ttk.Radiobutton(acta_frame, text="Acta de replanteo", variable=self.tipo_acta, value="replanteo",
+                        style='TRadiobutton').pack(side='left')
+        ttk.Radiobutton(acta_frame, text="Acta de instalación", variable=self.tipo_acta, value="instalacion",
+                        style='TRadiobutton').pack(side='left')
 
         # Variable para la opción "soporte con rodes"
         self.soporte_con_ruedas = tk.BooleanVar()
@@ -306,7 +306,12 @@ class CrearComentarioView(tk.Toplevel):
         self.extra_comments = {
             "Cambio de soporte de ruedas a pared fijo": "Canvi a suport fixe de paret (ja preautoritzat) a petició del centre.",
             "Cambio de soporte de pared a con patas": "Canvi a suport amb potes per paret inconsistent (pladur o altres materials no segurs).",
-            "Cambio de soporte por imposibilidad de instalación (elementos sanitarios o aulas modulares)": "Canvi de suport a rodes per impossibilitat tècnica a l'aula (motiu: radiador, pica, mòdul...)."
+            "Cambio de soporte por imposibilidad de instalación (elementos sanitarios o aulas modulares)": "Canvi de suport a rodes per impossibilitat tècnica a l'aula (motiu: radiador, pica, mòdul...).",
+            "Codigo de aula diferente": "Al plànol el centre indica que l'aula XXXX s'anomena XXXX.",
+            "Aula Docente": "El centre ha transformat aquesta aula en un aula docent.",
+            "Radiador a la vista": "El panell s'instal·larà a l'esquerra / la dreta a causa de la presència d'un radiador."
+
+
         }
         self.extra_comment_vars = {comment: tk.BooleanVar() for comment in self.extra_comments.keys()}
         self.extra_checkbuttons = {}
@@ -437,7 +442,7 @@ class CrearComentarioView(tk.Toplevel):
                     self.extra_checkbuttons[comment].config(state='disabled')
 
     def generate_comment(self):
-        acta_text = "Resum del material a retirar:" if self.tipo_acta.get() == "replanteo" else "Resum del material retirat:"
+        acta_text = "Resum del material a retirar:" if self.tipo_acta.get() == "replanteo" else "Nombre total d'elements desinstal·lats: 0."
 
         if self.soporte_con_ruedas.get():
             comment1 = f"{acta_text} No es fa retirada perquè es monta suport amb rodes."
