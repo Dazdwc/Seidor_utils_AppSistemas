@@ -1,4 +1,4 @@
-from AppSistemas.Herramienta_Desarrollo.LicenseManager import LicenseManager
+from Herramienta_Desarrollo.LicenseManager import LicenseManager
 import os
 
 if __name__ == "__main__":

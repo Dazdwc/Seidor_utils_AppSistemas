@@ -1,7 +1,7 @@
 import time
 import tkinter as tk
-from AppSistemas.Herramienta_Desarrollo.modelo.Modelo import ImageConverterService, ExcelService, ExtractorService, AutomationService
-from AppSistemas.Herramienta_Desarrollo.vista.Vista import MainView, HerramientasReplanteo, HerramientasInstalacion, \
+from Herramienta_Desarrollo.modelo.Modelo import ImageConverterService, ExcelService, ExtractorService, AutomationService
+from Herramienta_Desarrollo.vista.Vista import MainView, HerramientasReplanteo, HerramientasInstalacion, \
     FormateadorImagenView, CheckActaView, CrearComentarioView, AutomatizarTeclasView
 from tkinter import filedialog, messagebox
 

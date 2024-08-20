@@ -435,7 +435,7 @@ class AutomationService:
         pyautogui.press('tab')
 
         # Nombre aula
-        pyautogui.write(f'{dato['nombre_aula']}')
+        pyautogui.write(f'{dato["nombre_aula"]}')
 
         # Pasar de ventana
         pyautogui.press('tab')

@@ -1,6 +1,6 @@
-from AppSistemas.Herramienta_Desarrollo.controladores.MainController import MainController
-from AppSistemas.Herramienta_Desarrollo.LicenseManager import LicenseManager
-from AppSistemas.Herramienta_Desarrollo.vista.Vista import show_error_message
+from Herramienta_Desarrollo.controladores.MainController import MainController
+from Herramienta_Desarrollo.LicenseManager import LicenseManager
+from Herramienta_Desarrollo.vista.Vista import show_error_message
 import os
 import sys
 
