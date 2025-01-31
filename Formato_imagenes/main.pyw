@@ -99,7 +99,7 @@ class AplicacionConversorImagenes:
         archivos_validos = []
         for raiz, _, archivos in os.walk(directorio):
             for archivo in archivos:
-                if archivo.lower().endswith(('.png', '.jpg', '.jpeg', '.heic')):
+                if archivo.lower().endswith(('.png', '.jpg', '.jpeg', '.heic', '.tiff', '.jfif', '.bmp')):
                     archivos_validos.append(os.path.join(raiz, archivo))
         return archivos_validos
 

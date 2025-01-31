@@ -1,5 +1,3 @@
-import time
-
 import pandas as pd
 import matplotlib.pyplot as plt
 import os
@@ -51,7 +49,7 @@ def generate_image(file_path, sheet_name, search_value, output_directory=None):
     for i in range(1, len(combined_df)):  # Empieza desde 1 para excluir la fila de títulos
         for j in range(1, len(combined_df.columns)):  # Empieza desde 1 para excluir la columna de leyenda
             value = combined_df.iat[i, j]
-            if pd.notna(value) and value > 1:  # Verifica si la celda tiene un valor mayor a 1
+            if pd.notna(value) and value > 0:  # Verifica si la celda tiene un valor mayor a 1
                 table[(i + 1, j)].set_facecolor('#98FB98')  # Color verde claro para las celdas con valor superior a 1
 
     # Determinar la ruta de guardado
@@ -83,7 +81,7 @@ def process_excel(file_path, sheet_name):
         value2 = str(df.iloc[1, df.columns.get_loc(col)])  # Valor de la segunda fila (B2, C2, ...)
 
         # Crear el nombre del directorio
-        directory_name = f"{value1}_{value2}"
+        directory_name = f"{value1} {value2}"
         directory_path = os.path.join(os.getcwd(), directory_name)
 
         # Crear el directorio si no existe
@@ -92,7 +90,6 @@ def process_excel(file_path, sheet_name):
 
         # Llamar a la función generate_image con el valor de B1, C1, etc., y guardar la imagen en la carpeta creada
         generate_image(file_path, sheet_name, value1, directory_path)
-        time.sleep(1)  # Esperar 1 segundo para evitar problemas con la generación de imágenes
         print(f"Imagen generada y guardada en {directory_path}")
 
 

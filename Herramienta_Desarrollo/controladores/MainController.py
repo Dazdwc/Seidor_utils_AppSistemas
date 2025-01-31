@@ -48,6 +48,7 @@ class MainController:
             self.check_acta_view = CheckActaView(self)
         else:
             self.check_acta_view.lift()
+
     def comentarios(self):
         if self.check_comentarios_view is None or not self.check_comentarios_view.winfo_exists():
             self.check_comentarios_view = CrearComentarioView(self)

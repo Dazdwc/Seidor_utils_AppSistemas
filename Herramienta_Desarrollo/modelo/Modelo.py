@@ -115,8 +115,6 @@ class ExcelService:
             datos_instalador = {
                 "DNI": "45489700R",
                 "NOM": "David Quiñonero",
-                #"CÀRREC": "Tècnic",
-                #"TELÈFON": "647999633"
                 "FECHA": time.strftime("%d/%m/%Y")
             }
 
